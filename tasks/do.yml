@@ -1,0 +1,12 @@
+---
+- name: Process firewall rules
+  lineinfile:
+    dest: /etc/sysconfig/iptables
+    regexp: '{{item.0.comment}}: {{item.0.proto}}://{{item.1}}:\*->\*:{{item.0.dport|join(",")}}'
+    line: "-A INPUT -s {{item.1}} -m {{item.0.proto}} -p {{item.0.proto}} -m multiport --dports {{item.0.dport|join(',')}} -j ACCEPT -m comment --comment \"{{item.0.comment}}: {{item.0.proto}}://{{item.1}}:*->*:{{item.0.dport|join(',')}}\" -m state --state {{item.state|default('NEW')}}"
+    insertafter: '^:OUTPUT ACCEPT \[\d*:\d*\]$'
+  with_subelements:
+    - "{{ add_rules }}"
+    - "shost"
+  notify:
+    - restart firewall

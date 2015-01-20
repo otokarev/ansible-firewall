@@ -1,0 +1,8 @@
+---
+- name: Install itables
+  yum: name=iptables state=installed
+- name: Set iptables to autostart on boot
+  command: chkconfig iptables on
+- name: iptables running
+  service: name=iptables state=started
+
